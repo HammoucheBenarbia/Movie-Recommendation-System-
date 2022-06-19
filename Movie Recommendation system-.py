@@ -61,11 +61,7 @@ import pandas as pd
 import numpy as np
 
 
-# # Load the data 
-
-# In[4]:
-
-
+# Load the data 
 #read the data sets and check the first few rows 
 ratings=pd.read_csv("ratings.csv")
 movies=pd.read_csv("movies.csv")
@@ -80,24 +76,12 @@ print(movies.head(10))
 ratings=ratings.drop(["timestamp"],axis=1)
 print(ratings.head(10))
 
-
-# In[6]:
-
-
 #Merge ratings and movies datasets
 ratings_movies=pd.merge(ratings,movies,on="movieId")
 print(ratings_movies.head())
 
-
-# In[35]:
-
-
 #Check for missing values in the dataset 
 print(ratings_movies.isnull().sum())
-
-
-# In[37]:
-
 
 #Create a dictionary to map movie id with movies titles 
 movie_dic={}
@@ -134,16 +118,9 @@ R=ratings_movies.groupby(["movieId"])["rating"].mean().reset_index()
 print(R)
 
 
-# In[145]:
-
-
 # Compute the number of ratings for each movie ID 
 V=ratings_movies.groupby(["movieId"])["rating"].count().reset_index()
 print(V)
-
-
-# In[16]:
-
 
 # The mean of  all movie ratings 
 C=ratings_movies.rating.mean()
@@ -159,8 +136,6 @@ print(C)
 # M = minimum votes required
 # 𝐶 = the mean vote across the whole rating column 
 
-# In[17]:
-
 
 # Create a function " ranking" to compute the Weighted ratings 
 def ranking (v,r):
@@ -170,8 +145,6 @@ def ranking (v,r):
 
 
 # The following code will create two lists, the first one for number of ratings and the second for the average rating for each movie. theses lists will be used later for computing the weighting rate for each movie 
-
-# In[38]:
 
 
 # Create two lists number of votes (Vlist) and the mean rating of the movie
@@ -186,9 +159,6 @@ for k in (range(9724)):
 
 # The following code will be used to compute the weighted rating for each movie. 
 
-# In[39]:
-
-
 #Compute the weighted rate for each movie 
 List=[] # Empty list to append WR 
 movieId_={} # Create dictionary to map between each score and its index
@@ -202,8 +172,6 @@ List.sort(reverse=True)
 
 
 # The following code generate Top 50 recommender by looping through list of scores that we created previously then get the index of the movie and finaly using movie_dict to track back the movie title 
-
-# In[302]:
 
 
 #generate N Top recommender 
@@ -233,9 +201,6 @@ print(*recommendation_list[:50],sep="\n")
 
 # ![Screen%20Shot%202021-12-10%20at%206.30.09%20PM.png](attachment:Screen%20Shot%202021-12-10%20at%206.30.09%20PM.png)
 
-# In[298]:
-
-
 # Create Cosine simmilarity function
 def cosin_sim (U1,U2): # define two users U1 and U2 
     User=[] # List to append The product of users' magnitude 
@@ -255,10 +220,6 @@ def cosin_sim (U1,U2): # define two users U1 and U2
     U2_=sum(u2_)**0.5
 
     return U1_U2/(U1_*U2_) # cosine 
-
-
-# In[299]:
-
 
 #create function to recommend users based on cosin simmilarity 
 def recomm_ (user_id,dataset,number): # define inputs where number is how many movies we will recommende 
@@ -296,16 +257,8 @@ def recomm_ (user_id,dataset,number): # define inputs where number is how many m
     print( *movies_to_recommend[:10],sep="\n" )
     return  
 
-
-# In[303]:
-
-
 # list of 10 recommended movies for userID=34
 recomm_(34,ratings_movies,10)
-
-
-# In[305]:
-
 
 # list of 10 recommended movies for userID=34
 recomm_(1,ratings_movies,3)
@@ -360,10 +313,6 @@ sorted_movies=ratings_movies.groupby(["movieId"])["rating"].count().reset_index(
 sorted_movies=sorted_movies.sort_values('rating', ascending=False).reset_index()
 sorted_movies
 
-
-# In[280]:
-
-
 # select the top 20 Movies with high number of ratings 
 Movie_indx=sorted_movies.movieId.values
 m=[]
@@ -372,18 +321,10 @@ for i in (Movie_indx[0:20]):
 print(m)
 most_rated_movies= ratings_movies.loc[ratings_movies['movieId'].isin(m)]
 
-
-# In[219]:
-
-
 # sort the dataset by users that have gave high number of  ratings
 sorted_users=ratings_movies.groupby(["userId"])["rating"].count().reset_index()
 sorted_users=sorted_users.sort_values('rating', ascending=False).reset_index()
 sorted_users
-
-
-# In[281]:
-
 
 # select the top 20 users that gave high number of ratings 
 Movie_indx=sorted_movies.movieId.values
@@ -392,10 +333,6 @@ for i in (Movie_indx[0:20]):
     m.append(i)
 print(m)
 most_rated_movies= ratings_movies.loc[ratings_movies['movieId'].isin(m)]
-
-
-# In[282]:
-
 
 # Select sample data with that have high number of ratings 
 user_indx=sorted_users.userId.values
@@ -409,9 +346,6 @@ sample_data
 
 # # Convert training and testing datasets to matrices 
 
-# In[283]:
-
-
 # Create training Matrix 
 T_matrix=sample_data.pivot_table(index="userId",columns="movieId",values="rating")
 # Create an array and fill NA values with zeros 
@@ -420,9 +354,6 @@ print(T_matrix)
 
 
 # Because it takes times to run matrix factorization, i will use a small sample of sampled data dataset 
-
-# In[284]:
-
 
 # select a subset from the whole data,  we will use 20 X 20 matrix 
 Test_matrix=T_matrix[:20,:20]
@@ -433,10 +364,6 @@ Test_matrix=T_matrix[:20,:20]
 Train_matrix=Test_matrix
 Train_matrix
 
-
-# In[285]:
-
-
 # look for indexs of non-null values 
 U_index,I_index=Train_matrix.nonzero()
 # shuffle the indexes to get random indexes of the matrix 
@@ -445,33 +372,18 @@ np.random.shuffle(I_index)
 print(U_index)
 print(I_index)
 
-
-# In[286]:
-
-
 # Check the size of non null values in the original training  matrix 
 print(len(U_index))
 print(len(I_index))
-
-
-# In[289]:
-
 
 # defining the size of testing values by selecting  indexes for the values that we will set to zero 
 U_index=U_index[:73]
 I_index=I_index[:73]
 
-
-# In[290]:
-
-
 # Change values intentionaly to zero in the training set to compare how the model will predict these values 
 for us,itm in zip(U_index,I_index):
     Train_matrix[us,itm]=0
 Train_matrix
-
-
-# In[294]:
 
 
 # Define matrix factorization 
@@ -507,10 +419,6 @@ def matrix_factorization(R,K,epoch,Alpha=0.1,Beta=0.01):
         pred_matrix=b+bu[:,np.newaxis]+bi[np.newaxis,:]+P.dot(Q.T) # get the final prediction    
     return pred_matrix
 
-
-# In[295]:
-
-
 #run the matrix factorization to find the optimal iteration with lowest RMSE
 def run_matrix(matrix):
     rmse=[] # list of RMSE 
@@ -533,16 +441,8 @@ def run_matrix(matrix):
     print(min(rmse)/n)
     return matrix_factorization(matrix,2,K_dic[min(rmse)])
 
-
-# In[296]:
-
-
 Predicted_matrix=run_matrix(Train_matrix)
 Predicted_matrix
-
-
-# In[297]:
-
 
 #Check the RMSE of the testing data 
 errors=0
@@ -560,14 +460,8 @@ print(T_RMSE/N) # Mean sqrt of sum squared errors
 
 # Now i will try to use surprise package to predicte the ratings and compare different RMSE to the one that we computed previously using Matrix Factorization 
 
-# In[36]:
-
-
 # install scikit-surprise Package 
 conda install -c conda-forge scikit-surprise
-
-
-# In[27]:
 
 
 # Load the necessary models ( SVD,NMF,KNN) along with other libraries 
@@ -579,17 +473,9 @@ from surprise import NMF
 from surprise import KNNWithMeans
 from surprise import Reader, Dataset
 
-
-# In[115]:
-
-
 # Prepare the dataset that will be user for the scikit-surprise models 
 reader = Reader(rating_scale=(0.5, 5.0))
 data = Dataset.load_from_df(ratings_movies[['userId', 'movieId', 'rating']], reader)
-
-
-# In[30]:
-
 
 # Fit the models and use (n_folds=5 cross validation)
 # svd
@@ -603,13 +489,7 @@ model_knn=KNNWithMeans()
 cross_validate(model_knn, data, measures=['RMSE'], cv=5, verbose=True)
 
 
-# In[101]:
-
-
 import matplotlib.pyplot as plt
-
-
-# In[273]:
 
 
 # plot the RMSE of different models
